@@ -7,12 +7,14 @@
 
 #include "server/zone/managers/loot/LootManager.h"
 #include "server/zone/objects/scene/SceneObject.h"
+#include "server/zone/objects/creature/CreatureObject.h"
 #include "server/zone/objects/creature/ai/AiAgent.h"
 #include "server/zone/objects/tangible/weapon/WeaponObject.h"
 #include "server/zone/managers/crafting/CraftingManager.h"
 #include "templates/LootItemTemplate.h"
 #include "templates/LootGroupTemplate.h"
 #include "server/zone/ZoneServer.h"
+#include "server/zone/objects/creature/CreatureObject.h"
 #include "LootGroupMap.h"
 #include "server/zone/objects/tangible/component/lightsaber/LightsaberCrystalComponent.h"
 
@@ -468,13 +470,17 @@ TangibleObject* LootManagerImplementation::createLootObject(LootItemTemplate* te
 	setSockets(prototype, craftingValues);
 
 	// Update the Tano with new values
+
 	prototype->updateCraftingValues(craftingValues, true);
+
 
 	//add some condition damage where appropriate
 	if (!maxCondition)
 		addConditionDamage(prototype, craftingValues);
 
+
 	delete craftingValues;
+
 
 	// Update object name with mod stat if is attachment
 	if(prototype->isAttachment()){
@@ -507,6 +513,79 @@ TangibleObject* LootManagerImplementation::createLootObject(LootItemTemplate* te
 
 
 	return prototype;
+}
+
+TangibleObject* LootManagerImplementation::createLootAttachment(LootItemTemplate* templateObject, const String& modName, int value) {
+	
+	const String& directTemplateObject = templateObject->getDirectObjectTemplate();
+	
+	ManagedReference<TangibleObject*> prototype = zoneServer->createObject(directTemplateObject.hashCode(), 2).castTo<TangibleObject*>();
+	
+	if (prototype == NULL) {
+		error("could not create loot object: " + directTemplateObject);
+		return NULL;
+	}
+
+	Locker objLocker(prototype);
+
+	prototype->createChildObjects();
+
+	String serial = craftingManager->generateSerial();
+	prototype->setSerialNumber(serial);
+
+	ValuesMap valuesMap = templateObject->getValuesMapCopy();
+	CraftingValues* craftingValues = new CraftingValues(valuesMap);
+
+	setInitialObjectStats(templateObject, craftingValues, prototype);
+
+	setCustomObjectName(prototype, templateObject);
+
+	String subtitle;
+
+	for (int i = 0; i < craftingValues->getExperimentalPropertySubtitleSize(); ++i) {
+		subtitle = craftingValues->getExperimentalPropertySubtitle(i);
+
+		if (subtitle == "hitpoints" && !prototype->isComponent()) {
+			continue;
+		}
+
+		float min = craftingValues->getMinValue(subtitle);
+		float max = craftingValues->getMaxValue(subtitle);
+	}
+
+
+	if(prototype->isAttachment()){
+		Attachment* attachment = cast<Attachment*>( prototype.get());
+		attachment->updateAttachmentValues(modName, value);
+		delete craftingValues;
+	
+		HashTable<String, int>* mods = attachment->getSkillMods();
+		HashTableIterator<String, int> iterator = mods->iterator();
+		StringId attachmentName;
+		String key = "";
+		int value = 0;
+		int last = 0;
+		String attachmentType = "AA ";
+		String attachmentCustomName = "";
+
+		if(attachment->isClothingAttachment()){
+			attachmentType = "CA ";
+		}
+
+		for(int i = 0; i < mods->size(); ++i) {
+			iterator.getNextKeyAndValue(key, value);
+
+			if(value > last){
+				last = value;
+				attachmentName.setStringId("stat_n", key);
+				prototype->setObjectName(attachmentName,false);
+				attachmentCustomName = attachmentType + prototype->getDisplayedName() + " " + String::valueOf(value);
+			}
+		}
+		prototype->setCustomObjectName(attachmentCustomName,false);
+	}
+	return prototype;
+
 }
 
 void LootManagerImplementation::addConditionDamage(TangibleObject* loot, CraftingValues* craftingValues) {
@@ -557,8 +636,8 @@ void LootManagerImplementation::setSkillMods(TangibleObject* object, LootItemTem
 
 			if(mod == 0)
 				mod = 1;
-
-			String modName = getRandomLootableMod( object->getGameObjectType() );
+			// This is where additional mods are addded for multi-mod attachments.
+			String modName = getRandomLootableMod(object->getGameObjectType());
 			if( !modName.isEmpty() )
 				additionalMods.put(modName, mod);
 		}
@@ -912,16 +991,16 @@ void LootManagerImplementation::addRandomDots(TangibleObject* object, LootItemTe
 			else
 				str = strMax;
 
-			if (excMod == 1.0 && (yellowChance == 0 || System::random(yellowChance) == 0)) {
+			/*if (excMod == 1.0 && (yellowChance == 0 || System::random(yellowChance) == 0)) {
 				str *= yellowModifier;
-			}
+			}*/
 
 			if (dotType == 1)
 				str = str * 2;
 			else if (dotType == 3)
 				str = str * 1.5;
 
-			weapon->addDotStrength(str * excMod);
+			weapon->addDotStrength(str);
 
 			int durMin = randomDotDuration.elementAt(0);
 			int durMax = randomDotDuration.elementAt(1);
@@ -932,16 +1011,16 @@ void LootManagerImplementation::addRandomDots(TangibleObject* object, LootItemTe
 			else
 				dur = durMax;
 
-			if (excMod == 1.0 && (yellowChance == 0 || System::random(yellowChance) == 0)) {
+			/*if (excMod == 1.0 && (yellowChance == 0 || System::random(yellowChance) == 0)) {
 				dur *= yellowModifier;
-			}
+			}*/
 
 			if (dotType == 2)
 				dur = dur * 5;
 			else if (dotType == 3)
 				dur = dur * 1.5;
 
-			weapon->addDotDuration(dur * excMod);
+			weapon->addDotDuration(dur);
 
 			int potMin = randomDotPotency.elementAt(0);
 			int potMax = randomDotPotency.elementAt(1);
@@ -952,11 +1031,11 @@ void LootManagerImplementation::addRandomDots(TangibleObject* object, LootItemTe
 			else
 				pot = potMax;
 
-			if (excMod == 1.0 && (yellowChance == 0 || System::random(yellowChance) == 0)) {
+			/*if (excMod == 1.0 && (yellowChance == 0 || System::random(yellowChance) == 0)) {
 				pot *= yellowModifier;
-			}
+			}*/
 
-			weapon->addDotPotency(pot * excMod);
+			weapon->addDotPotency(pot);
 
 			int useMin = randomDotUses.elementAt(0);
 			int useMax = randomDotUses.elementAt(1);
@@ -967,11 +1046,11 @@ void LootManagerImplementation::addRandomDots(TangibleObject* object, LootItemTe
 			else
 				use = useMax;
 
-			if (excMod == 1.0 && (yellowChance == 0 || System::random(yellowChance) == 0)) {
+			/*if (excMod == 1.0 && (yellowChance == 0 || System::random(yellowChance) == 0)) {
 				use *= yellowModifier;
-			}
+			}*/
 
-			weapon->addDotUses(use * excMod);
+			weapon->addDotUses(use);
 		}
 
 		weapon->addMagicBit(false);

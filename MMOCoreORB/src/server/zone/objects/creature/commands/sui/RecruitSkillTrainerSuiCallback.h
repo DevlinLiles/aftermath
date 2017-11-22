@@ -155,6 +155,9 @@ public:
 				break;
 
 		case 32: trainerTemplatePath = "trainer_weaponsmith";
+				break;
+
+		case 33: trainerTemplatePath = "trainer_basebuster";
 
 		}
 
@@ -168,6 +171,10 @@ public:
 				player->sendSystemMessage(msg); //"The city treasury must have %DI credits in order to perform that action.");
 				return;
 
+			}
+
+			if(player->isSwimming() || player->isIncapacitated() || player->isDead()) {
+				return;
 			}
 
 			CreatureObject* trainer = zone->getCreatureManager()->spawnCreature(trainerTemplatePath.hashCode(),0,player->getWorldPositionX(),player->getWorldPositionZ(),player->getWorldPositionY(),0,true);

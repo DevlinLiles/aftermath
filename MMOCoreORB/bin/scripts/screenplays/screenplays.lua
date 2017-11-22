@@ -29,8 +29,11 @@ require("sui.custom.SuiReceiverPuzzle")
 
 -- Custom content
 includeFile("../custom_scripts/screenplays/screenplays.lua")
+--includeFile("../custom_scripts/screenplays/glowing.lua")
 
 includeFile("helperfuncs.lua")
+
+includeFile("playerTriggers.lua")
 
 
 -- Theme parks
@@ -71,6 +74,7 @@ includeFile("trainers/trainerConvHandler.lua")
 includeFile("gcw/newsnet.lua")
 includeFile("gcw/recruiters/recruiterConvoHandler.lua")
 includeFile("gcw/recruiters/recruiterScreenplay.lua")
+includeFile("crackdown/cantina.lua")
 
 -- Quest Tasks
 includeFile("quest_tasks/task.lua")
@@ -115,6 +119,12 @@ includeFile("dungeon/death_watch_bunker/conversations/deathWatchTechnicianConvoH
 includeFile("dungeon/death_watch_bunker/conversations/deathWatchWorkshopDroidConvoHandler.lua")
 includeFile("dungeon/geonosian_lab/geo_lab.lua")
 includeFile("dungeon/warren/warren.lua")
+includeFile("dungeon/warren/warrenComponents.lua")
+includeFile("dungeon/warren/convos/mirla_convo_handler.lua")
+includeFile("dungeon/warren/convos/oevitt_piboi_convo_handler.lua")
+includeFile("dungeon/warren/convos/manx_try_convo_handler.lua")
+includeFile("dungeon/warren/convos/captain_heff_convo_handler.lua")
+includeFile("dungeon/warren/convos/warren_worker_convo_handler.lua")
 includeFile("dungeon/corellian_corvette/conversations/corvetteTicketTakerConvoHandler.lua")
 includeFile("dungeon/corellian_corvette/conversations/corvetteTicketGiverConvoHandler.lua")
 includeFile("dungeon/corellian_corvette/conversations/corvetteRepairDroidConvoHandler.lua")
@@ -139,6 +149,7 @@ includeFile("dungeon/corellian_corvette/ticket_givers/corvette_yondalla_neutral_
 includeFile("dungeon/corellian_corvette/ticket_takers/ds_297.lua")
 includeFile("dungeon/corellian_corvette/ticket_takers/klaatu.lua")
 includeFile("dungeon/corellian_corvette/ticket_takers/lt_lance.lua")
+includeFile("dungeon/lok_bunker/lok_bunker.lua")
 
 
 -- Village
@@ -150,7 +161,7 @@ includeFile("village/village_jedi_manager_township.lua")
 includeFile("village/village_raids.lua")
 includeFile("village/village_spawn_table.lua")
 includeFile("village/intro/fs_intro.lua")
-includeFile("village/intro/glowing.lua")
+--includeFile("village/intro/glowing.lua")
 includeFile("village/intro/go_to_dathomir.lua")
 includeFile("village/intro/old_man_intro_encounter.lua")
 includeFile("village/intro/sith_shadow_encounter.lua")
@@ -262,16 +273,26 @@ includeFile("jedi/components/ForceShrineMenuComponent.lua")
 includeFile("jedi/components/TrialsSearchObjectMenuComponent.lua")
 
 -- Events - Bestine Election
-includeFile("events/conversations/bestine_election/bestine_election_conv_handler.lua")
-includeFile("events/conversations/bestine_election/bestine_election_questn_conv_handler.lua")
-includeFile("events/conversations/bestine_election/bestine_election_questp_conv_handler.lua")
-includeFile("events/conversations/bestine_election/stone_merchant_conv_handler.lua")
-includeFile("events/conversations/bestine_election/hutt_informant_conv_handler.lua")
---includeFile("events/conversations/bestine_election/sean_trenwell_conv_handler.lua")
-includeFile("events/conversations/bestine_election/sean_contact_conv_handler.lua")
-includeFile("events/conversations/bestine_election/seans_historian_conv_handler.lua")
-includeFile("events/conversations/bestine_election/tour_aryon_conv_handler.lua")
-includeFile("events/conversations/bestine_election/victor_visalis_conv_handler.lua")
+includeFile("events/bestine_election/bestineElection.lua")
+includeFile("events/bestine_election/bestineElectionMenuComponents.lua")
+includeFile("events/bestine_election/bestineElectionSpawns.lua")
+includeFile("events/bestine_election/convos/bestine_rumor_conv_handler.lua")
+includeFile("events/bestine_election/convos/bestine_stone_merchant_conv_handler.lua")
+includeFile("events/bestine_election/convos/hutt_informant_conv_handler.lua")
+includeFile("events/bestine_election/convos/indigo_siyan_conv_handler.lua")
+includeFile("events/bestine_election/convos/keanna_likyna_conv_handler.lua")
+includeFile("events/bestine_election/convos/sean_contact_conv_handler.lua")
+includeFile("events/bestine_election/convos/sean_questn_university_conv_handler.lua")
+includeFile("events/bestine_election/convos/sean_questp_house_conv_handler.lua")
+includeFile("events/bestine_election/convos/sean_questp_market_conv_handler.lua")
+includeFile("events/bestine_election/convos/sean_trenwell_conv_handler.lua")
+includeFile("events/bestine_election/convos/seans_historian_conv_handler.lua")
+includeFile("events/bestine_election/convos/victor_questn_cantina_conv_handler.lua")
+includeFile("events/bestine_election/convos/victor_questn_capitol_conv_handler.lua")
+includeFile("events/bestine_election/convos/victor_questp_hospital_conv_handler.lua")
+includeFile("events/bestine_election/convos/victor_questp_slums_conv_handler.lua")
+includeFile("events/bestine_election/convos/victor_visalis_conv_handler.lua")
+includeFile("events/bestine_election/convos/tour_aryon_conv_handler.lua")
 
 -- Events
 includeFile("events/conversations/bestine_artist_conv_handler.lua")
@@ -289,8 +310,6 @@ includeFile("events/conversations/rebel_commander_conv_handler.lua")
 includeFile("events/conversations/rebel_coordinator_conv_handler.lua")
 includeFile("events/conversations/rebel_lyda_conv_handler.lua")
 includeFile("events/conversations/rebel_sympathizer_conv_handler.lua")
-includeFile("events/bestineElection.lua")
-includeFile("events/bestineElectionMenuComponents.lua")
 includeFile("events/bestineMuseum.lua")
 includeFile("events/coa2Screenplay.lua")
 includeFile("events/eventPromoter.lua")
@@ -640,3 +659,6 @@ includeFile("record_keepers/record_keepers.lua")
 --Tests
 includeFile("tests/tests.lua")
 
+--Merchants
+includeFile("merchants/house_merch.lua")
+includeFile("merchants/merchant_system.lua")

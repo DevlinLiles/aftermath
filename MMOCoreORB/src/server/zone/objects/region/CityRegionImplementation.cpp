@@ -180,6 +180,10 @@ int CityRegionImplementation::getTimeToUpdate() {
 	return round(nextUpdateTime.miliDifference() / -1000.f);
 }
 
+int CityRegionImplementation::getTimeToVote() {
+	return round(nextInauguration.miliDifference() / -1000.f);
+}
+
 void CityRegionImplementation::notifyEnter(SceneObject* object) {
 	if (object->getCityRegion().get() != _this.getReferenceUnsafeStaticCast() && object->isPlayerCreature())
 		currentPlayers.increment();
@@ -799,6 +803,8 @@ void CityRegionImplementation::applySpecializationModifiers(CreatureObject* crea
 	typedef VectorMap<String, int> SkillMods;
 	typedef VectorMapEntry<String, int> SkillModsEntry;
 
+	static const String lambdaName = "ApplySpecializationModifiersLambda";
+
 	creature->executeOrderedTask([=] () {
 		Locker locker(creatureReference);
 
@@ -815,17 +821,19 @@ void CityRegionImplementation::applySpecializationModifiers(CreatureObject* crea
 
 			creatureReference->addSkillMod(SkillModManager::CITY, entry.getKey(), entry.getValue());
 		}
-	}, "ApplySpecializationModifiersLambda");
+	}, lambdaName);
 }
 
 void CityRegionImplementation::removeSpecializationModifiers(CreatureObject* creature) {
 	Reference<CreatureObject*> creatureReference = creature;
 
+	static const String lambdaName = "RemoveSpecializationModifiersLambda";
+
 	creature->executeOrderedTask([=] () {
 		Locker locker(creatureReference);
 
 		creatureReference->removeAllSkillModsOfType(SkillModManager::CITY);
-	}, "RemoveSpecializationModifiersLambda");
+	}, lambdaName);
 }
 
 void CityRegionImplementation::transferCivicStructuresToMayor() {

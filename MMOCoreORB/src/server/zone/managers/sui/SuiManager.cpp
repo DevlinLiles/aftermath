@@ -361,7 +361,7 @@ void SuiManager::handleCharacterBuilderSelectItem(CreatureObject* player, SuiBox
 
 			if (templatePath == "unlearn_all_skills") {
 
-				SkillManager::instance()->surrenderAllSkills(player);
+				SkillManager::instance()->surrenderAllSkills(player, true, false);
 				player->sendSystemMessage("All skills unlearned.");
 
 			} else if (templatePath == "cleanse_character") {
@@ -489,7 +489,16 @@ void SuiManager::handleCharacterBuilderSelectItem(CreatureObject* player, SuiBox
 				player->sendSystemMessage(stringId);
 
 			} else if (templatePath == "enhance_character") {
-				bluefrog->enhanceCharacter(player);
+				bluefrog->enhanceCharacter(player, 0);
+
+			} else if (templatePath == "cheap_enhance_character") {
+				bluefrog->enhanceCharacter(player, 1);
+
+			} else if (templatePath == "expensive_enhance_character_mind"){
+				bluefrog->enhanceCharacter(player, 3);
+
+			} else if (templatePath == "expensive_enhance_character_body"){
+				bluefrog->enhanceCharacter(player, 2);
 
 			} else if (templatePath == "axkva_roll_rebel") {		
 				Reference<PlayerObject*> ghost = player->getSlottedObject("ghost").castTo<PlayerObject*>();		
@@ -519,7 +528,7 @@ void SuiManager::handleCharacterBuilderSelectItem(CreatureObject* player, SuiBox
 					return;		
 				}		
 				int success = System::random(100);		
-				if (success > 95) {		
+				if (success > 50) {		
 					lootManager->createLoot(inventory, "axkva_min", 302);		
 				}else{		
 					lootManager->createLoot(inventory, "axkva_min_terminal", 302);		
@@ -553,7 +562,7 @@ void SuiManager::handleCharacterBuilderSelectItem(CreatureObject* player, SuiBox
 					return;		
 				}		
 				int success = System::random(100);		
-				if (success > 95){		
+				if (success > 50){		
 					lootManager->createLoot(inventory, "axkva_min", 302);		
 				} else {		
 					lootManager->createLoot(inventory, "axkva_min_terminal", 302);		
@@ -589,18 +598,14 @@ void SuiManager::handleCharacterBuilderSelectItem(CreatureObject* player, SuiBox
 				}		
 				int success = System::random(100);		
 				if (success > 50) {		
-					lootManager->createLoot(inventory, "acklay", 157);		
-				} else if (success < 51 && success > 40){		
-					lootManager->createLoot(inventory, "weapons_all", 336);		
-				} else if (success < 41 && success > 30){		
-					lootManager->createLoot(inventory, "armor_all", 336);			
-				} else if (success < 31 && success > 25){		
+					lootManager->createLoot(inventory, "acklay", 157);					
+				} else if (success < 51 && success > 45){		
 					lootManager->createLoot(inventory, "armor_attachments", 336);		
-				} else if (success < 26 && success > 20){		
+				} else if (success < 46 && success > 30){		
 					lootManager->createLoot(inventory, "clothing_attachments", 336);		
-				} else if (success < 21 && success > 10){		
+				} else if (success < 31 && success > 20){		
 					lootManager->createLoot(inventory, "geonosian_common", 66);		
-				} else if (success < 11){		
+				} else if (success < 21){		
 					lootManager->createLoot(inventory, "geonosian_hard", 66);		
 				}		
 				player->sendSystemMessage("Congratulations! You have received loot from the Acklay and Geo Caves!");		
@@ -634,18 +639,14 @@ void SuiManager::handleCharacterBuilderSelectItem(CreatureObject* player, SuiBox
 				}		
 				int success = System::random(100);		
 				if (success > 50) {		
-					lootManager->createLoot(inventory, "acklay", 157);		
-				} else if (success < 51 && success > 40){		
-					lootManager->createLoot(inventory, "weapons_all", 336);		
-				} else if (success < 41 && success > 30){		
-					lootManager->createLoot(inventory, "armor_all", 336);			
-				} else if (success < 31 && success > 25){		
+					lootManager->createLoot(inventory, "acklay", 157);					
+				} else if (success < 51 && success > 45){		
 					lootManager->createLoot(inventory, "armor_attachments", 336);		
-				} else if (success < 26 && success > 20){		
+				} else if (success < 46 && success > 30){		
 					lootManager->createLoot(inventory, "clothing_attachments", 336);		
-				} else if (success < 21 && success > 10){		
+				} else if (success < 31 && success > 20){		
 					lootManager->createLoot(inventory, "geonosian_common", 66);		
-				} else if (success < 11){		
+				} else if (success < 21){		
 					lootManager->createLoot(inventory, "geonosian_hard", 66);		
 				}		
 				player->sendSystemMessage("Congratulations! You have received loot from the Acklay and Geo Caves!");		
@@ -678,12 +679,8 @@ void SuiManager::handleCharacterBuilderSelectItem(CreatureObject* player, SuiBox
 					return;		
 				}		
 				int success = System::random(100);		
-				if (success > 75) {		
-					lootManager->createLoot(inventory, "fire_breathing_spider", 108);		
-				} else if (success < 76 && success > 65){		
-					lootManager->createLoot(inventory, "weapons_all", 336);			
-				} else if (success < 66 && success > 55){		
-					lootManager->createLoot(inventory, "armor_all", 336);			
+				if (success > 55) {		
+					lootManager->createLoot(inventory, "fire_breathing_spider", 108);					
 				} else if (success < 56 && success > 45){		
 					lootManager->createLoot(inventory, "armor_attachments", 336);		
 				} else if (success < 46 && success > 35){		
@@ -723,12 +720,8 @@ void SuiManager::handleCharacterBuilderSelectItem(CreatureObject* player, SuiBox
 					return;		
 				}		
 				int success = System::random(100);		
-				if (success > 75) {		
-					lootManager->createLoot(inventory, "fire_breathing_spider", 108);		
-				} else if (success < 76 && success > 65){		
-					lootManager->createLoot(inventory, "weapons_all", 336);			
-				} else if (success < 66 && success > 55){		
-					lootManager->createLoot(inventory, "armor_all", 336);			
+				if (success > 55) {		
+					lootManager->createLoot(inventory, "fire_breathing_spider", 108);					
 				} else if (success < 56 && success > 45){		
 					lootManager->createLoot(inventory, "armor_attachments", 336);		
 				} else if (success < 46 && success > 35){		
@@ -768,16 +761,11 @@ void SuiManager::handleCharacterBuilderSelectItem(CreatureObject* player, SuiBox
 					return;		
 				}		
 				int success = System::random(100);		
-				if (success < 21)		
-				{		
-					lootManager->createLoot(inventory, "armor_all", 336);		
-				}else if (success > 20 && success < 41){		
-					lootManager->createLoot(inventory, "weapons_all", 336);		
-				} else if (success > 40 && success < 66) {		
+				if (success < 40) {		
 					lootManager->createLoot(inventory, "krayt_dragon_common", 336);		
-				} else if (success > 65 && success < 86){		
+				} else if (success > 41 && success < 69){		
 					lootManager->createLoot(inventory, "krayt_tissue_rare", 336);		
-				} else if (success > 85){		
+				} else if (success > 68){		
 					lootManager->createLoot(inventory, "krayt_pearls", 336);		
 				}		
 				player->sendSystemMessage("Congratulations! You have received loot from a Krayt Dragon Ancient!");		
@@ -810,16 +798,11 @@ void SuiManager::handleCharacterBuilderSelectItem(CreatureObject* player, SuiBox
 					return;		
 				}		
 				int success = System::random(100);		
-				if (success < 21)		
-				{		
-					lootManager->createLoot(inventory, "armor_all", 336);		
-				}else if (success > 20 && success < 41){		
-					lootManager->createLoot(inventory, "weapons_all", 336);		
-				} else if (success > 40 && success < 66) {		
+				if (success < 40) {		
 					lootManager->createLoot(inventory, "krayt_dragon_common", 336);		
-				} else if (success > 65 && success < 86){		
+				} else if (success > 41 && success < 69){		
 					lootManager->createLoot(inventory, "krayt_tissue_rare", 336);		
-				} else if (success > 85){		
+				} else if (success > 68){		
 					lootManager->createLoot(inventory, "krayt_pearls", 336);		
 				}		
 				player->sendSystemMessage("Congratulations! You have received loot from a Krayt Dragon Ancient!");		
@@ -858,6 +841,21 @@ void SuiManager::handleCharacterBuilderSelectItem(CreatureObject* player, SuiBox
 
 			} else if (templatePath == "clear_dots") {
 				player->clearDots();
+			} else if (templatePath == "frs_light_side") {
+				PlayerManager* pman = zserv->getPlayerManager();
+				pman->unlockFRSForTesting(player, 1);
+			} else if (templatePath == "frs_dark_side") {
+				PlayerManager* pman = zserv->getPlayerManager();
+				pman->unlockFRSForTesting(player, 2);
+
+			} else if (templatePath == "color_crystals" || templatePath == "krayt_pearls") {
+				ManagedReference<SceneObject*> inventory = player->getSlottedObject("inventory");
+
+				if (inventory == nullptr)
+					return;
+
+				LootManager* lootManager = zserv->getLootManager();
+				lootManager->createLoot(inventory, templatePath, 300, true);
 
 			} else if (templatePath == "max_xp") {
 				ghost->maximizeExperience();
@@ -865,6 +863,13 @@ void SuiManager::handleCharacterBuilderSelectItem(CreatureObject* player, SuiBox
 
 			} else if (templatePath == "become_glowy") {
 				bluefrog->grantGlowyBadges(player);
+
+			} else if (templatePath == "unlock_jedi_initiate") {
+				bluefrog->grantJediInitiate(player);
+
+			} else if (templatePath == "unlock_jedi_master") {
+				PlayerManager* pman = zserv->getPlayerManager();
+				pman->grantJediMaster(player);
 
 			} else {
 				if (templatePath.length() > 0) {

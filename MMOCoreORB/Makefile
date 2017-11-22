@@ -40,7 +40,8 @@
 # this exception also makes it possible to release a modified version
 # which carries forward this exception.
 
-IDLC = /usr/local/bin/idlc
+
+IDLC = ../MMOEngine/bin/idlc
 
 IDL_CLASSPATH = ../MMOEngine/include
 
@@ -53,10 +54,9 @@ all: #build
 	#cd build/unix && cmake ../.. && make
 	#cp build/unix/src/core3 bin
 
-build: idl gtest
+build: idl gtest gitlog
 	cd build/unix && make -j4 UNITTEST_DIRECTIVES="$(UNITTEST_DIRECTIVES)" #CC=clang CXX=clang++
 	cp build/unix/src/core3* bin
-	cd bin/conf && git log --pretty=format:'%h was %an, %ar, message: %s' -10 > rev.txt
 	rm build/unix/src/core3
 	rm build/unix/src/core3client
 	#done
@@ -64,14 +64,23 @@ build: idl gtest
 unittest: UNITTEST_DIRECTIVES = -fprofile-arcs -ftest-coverage
 unittest: build
 
+unittest-cmake: UNITTEST_DIRECTIVES = -fprofile-arcs -ftest-coverage
+unittest-cmake: build-cmake
+
+sanitizers-cmake: UNITTEST_DIRECTIVES = -fsanitize=address 
+sanitizers-cmake: build-cmake
+
 rebuild: clean build
+
+gitlog: 
+	cd bin/conf && git log --pretty=format:'%h was %an, %ar, message: %s' -10 > rev.txt
 
 idl:
 	$(IDLC) $(IDL_DIRECTIVES) -sd src anyadEclipse
 	#done
 
 gtest:
-	cd utils/gtest-1.6.0 && make all
+	cd utils/googletest-release-1.8.0/googlemock && ${MAKE} all
 
 config:
 	aclocal
@@ -82,8 +91,8 @@ config:
 	#done
 
 clean: cleanidl
-	cd build/unix && make clean
-	cd utils/gtest-1.6.0 && make clean
+	cd build/unix && ${MAKE} clean
+	cd utils/googletest-release-1.8.0/googlemock && ${MAKE} clean
 	#cd build/unix/src && rm *
 	#cd build/unix/src/.deps && rm *
 	#done
@@ -97,37 +106,19 @@ cleardb:
 
 PLATFORM:=$(shell uname -s)
 
-ifeq ($(PLATFORM),Linux)
-	CPU_CORES:=$(shell grep -c processor /proc/cpuinfo)
-
-	ENGINE3_DIR:=$(shell find /opt -name engine3* -print -quit)
-else
-ifeq ($(PLATFORM),Darwin)
-  	CPU_CORES:=$(sysctl hw.ncpu | awk '{print $2}')
-
-	ENGINE3_DIR:=$(shell find /opt -name engine3* -depth 0)
-endif
-endif
-
-build-cmake: idl gtest
-	cd build/unix && cmake -DCMAKE_INSTALL_PREFIX=`pwd`/../.. ../.. && make -j$(CPU_CORES)
-	cd build/unix && make install
-
-clean-cmake: cleanidl-cmake
-	cd build/unix && make clean && make cleanidl
+build-cmake: idl
+	cd build/unix && cmake -DBUILD_IDL=OFF -DRUN_GIT=ON -DCMAKE_CXX_FLAGS="$(UNITTEST_DIRECTIVES)" ../.. && ${MAKE}
 	#done
 
-IDLC_BIN:=$(ENGINE3_DIR)/bin/idlc
-
-idl-cmake:
-	#$(IDLC_BIN) -cp $(ENGINE3_DIR)/include -sd src *.idl
-
-cleanidl-cmake:
-	#$(IDLC_BIN) -rb -cp $(ENGINE3_DIR)/include -sd src *.idl
+build-cmake-with-idl:
+	cd build/unix && cmake -DBUILD_IDL=ON -DRUN_GIT=ON -DCMAKE_CXX_FLAGS="$(UNITTEST_DIRECTIVES)" ../.. && ${MAKE}
 	#done
 
-deleteidl:
-	$(IDLC) -delete $(IDL_DIRECTIVES) -sd src anyadEclipse
+clean-cmake:
+	rm -f build/unix/CMakeCache.txt
+	rm -f build/unix/cmake_install.cmake
+	rm -f build/unix/Makefile
+	rm -rf build/unix/CMakeFiles
 	#done
 
 DB_NAMESPACE=

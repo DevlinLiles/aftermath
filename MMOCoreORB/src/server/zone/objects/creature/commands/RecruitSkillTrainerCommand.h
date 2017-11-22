@@ -31,6 +31,9 @@ public:
 		if (!ghost->hasAbility("recruitskilltrainer"))
 			return GENERALERROR;
 
+		if (creature->isIncapacitated() || creature->isDead())
+			return GENERALERROR;
+
 		ManagedReference<CityRegion*> city = creature->getCityRegion().get();
 		if (city == NULL)
 			return GENERALERROR;
@@ -77,6 +80,7 @@ public:
 		suiTrainerType->addMenuItem("@city/city:st_tailor", 30);
 		suiTrainerType->addMenuItem("@city/city:st_unarmed", 31);
 		suiTrainerType->addMenuItem("@city/city:st_weaponsmith", 32);
+		suiTrainerType->addMenuItem("@city/city:st_basebuster", 33);
 
 		ghost->addSuiBox(suiTrainerType);
 		creature->sendMessage(suiTrainerType->generateMessage());

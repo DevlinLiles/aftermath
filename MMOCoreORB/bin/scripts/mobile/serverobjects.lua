@@ -45,3 +45,9 @@ includeFile("lair/serverobjects.lua")
 
 -- Outfits
 includeFile("outfits/serverobjects.lua")
+
+--Aftermath
+includeFile("aftermath/serverobjects.lua")
+
+--Merchants
+includeFile("merchants/serverobjects.lua")

@@ -26,12 +26,18 @@ public:
 	}
 
 	int doQueueCommand(CreatureObject* creature, const uint64& target, const UnicodeString& arguments) const {
+		// Return if Jedi is rooted
+		if (creature->isSnared()){
+			creature->sendSystemMessage("Something is preventing you from using the force to run.");
+			return GENERALERROR;
+		}
 		int res = creature->hasBuff(buffCRC) ? NOSTACKJEDIBUFF : doJediSelfBuffCommand(creature);
 
 		if (res == NOSTACKJEDIBUFF) {
 			creature->sendSystemMessage("@jedi_spam:already_force_running"); // You are already force running.
 			return GENERALERROR;
 		}
+		
 		// Return if something is in error.
 		if (res != SUCCESS) {
 			return res;

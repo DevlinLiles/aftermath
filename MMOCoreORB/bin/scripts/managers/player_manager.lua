@@ -44,19 +44,30 @@
 --GENERAL PLAYER SETTINGS
 -----------------------------------
 
+onlineCharactersPerAccount = 3 --How many characters are allowed online from a single account.
 allowSameAccountPvpRatingCredit = 0
 
 --Blue frog / GM buff values
-performanceBuff = 500
-medicalBuff = 750
-performanceDuration = 7200 -- in seconds
-medicalDuration = 7200 -- in seconds
+performanceBuff = 1250
+medicalBuff = 2500
+performanceDuration = 5400 -- in seconds
+medicalDuration = 5400 -- in seconds
+
+--Cheap Buffs
+cheapPerformanceBuff = 400
+cheapMedicalBuff = 750
+
+--Expensive Buffs
+expensivePerformanceBuff = 800
+expensivePerformanceSubBuff = 400
+expensiveMedicalBuff = 1750
+expensiveMedicalSubBuff = 1900
 
 --Sets the experience multiplier while grouped
 groupExpMultiplier = 1.2
 
 --Sets a global experience multiplier
-globalExpMultiplier = 1.5
+globalExpMultiplier = 6
 
 --Sets the base number of control devices of each type that a player can have in their datapad at once
 --For creature pets, A Creature Handler will have the base number + their stored pets skill mod as limit
@@ -153,7 +164,7 @@ veteranRewards = {
 		{templateFile = "object/tangible/loot/misc/loot_skull_ithorian.iff", milestone=400, oneTime=false, description="A Ithorian Skull"},
 		{templateFile = "object/tangible/loot/misc/loot_skull_thune.iff", milestone=400, oneTime=false, description="A Thune Skull"},
 		{templateFile = "object/tangible/loot/misc/loot_skull_voritor.iff", milestone=400, oneTime=false, description="A Voritor Lizard Skull"},
-		{templateFile = "object/tangible/wearables/helmet/helmet_s06.iff", milestone=400, oneTime=true, description="Rebel Endor Helmet"},
+		--{templateFile = "object/tangible/wearables/helmet/helmet_s06.iff", milestone=400, oneTime=true, description="Rebel Endor Helmet"},
 
 		-- 990 Day Rewards
 		{templateFile = "object/tangible/furniture/modern/rug_rect_lg_s01.iff", milestone=430, oneTime=false, description="Large Rectangular Rug (Style 1)"},
@@ -161,7 +172,7 @@ veteranRewards = {
 		{templateFile = "object/tangible/furniture/modern/rug_oval_lg_s01.iff", milestone=430, oneTime=false, description="Large Oval Rug"},
 		{templateFile = "object/tangible/furniture/modern/rug_rnd_lg_s01.iff", milestone=430, oneTime=false, description="Large Round Rug"},
 		{templateFile = "object/tangible/furniture/all/frn_all_desk_map_table.iff", milestone=430, oneTime=false, description="Round Data Terminal"},
-		{templateFile = "object/tangible/wearables/armor/nightsister/armor_nightsister_bicep_r_s01.iff", milestone=430, oneTime=true, description="Nightsister Melee Armguard"},
+		--{templateFile = "object/tangible/wearables/armor/nightsister/armor_nightsister_bicep_r_s01.iff", milestone=430, oneTime=true, description="Nightsister Melee Armguard"},
 
 		-- 1080 Day Rewards
 		{templateFile = "object/tangible/veteran_reward/one_year_anniversary/painting_01.iff", milestone=460, oneTime=false, description="Painting: Cast Wing in Flight"},

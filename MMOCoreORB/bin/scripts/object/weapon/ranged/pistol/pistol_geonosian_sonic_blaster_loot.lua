@@ -72,7 +72,7 @@ object_weapon_ranged_pistol_pistol_geonosian_sonic_blaster_loot = object_weapon_
 	damageType = STUN,
 
 	-- NONE, LIGHT, MEDIUM, HEAVY
-	armorPiercing = NONE,
+	armorPiercing = LIGHT,
 
 	-- combat_rangedspecialize_bactarifle, combat_rangedspecialize_rifle, combat_rangedspecialize_pistol, combat_rangedspecialize_heavy, combat_rangedspecialize_carbine
 	-- combat_meleespecialize_unarmed, combat_meleespecialize_twohand, combat_meleespecialize_polearm, combat_meleespecialize_onehand, combat_general,
@@ -80,7 +80,7 @@ object_weapon_ranged_pistol_pistol_geonosian_sonic_blaster_loot = object_weapon_
 	xpType = "combat_rangedspecialize_pistol",
 
 	-- See http://www.ocdsoft.com/files/certifications.xls
-	certificationsRequired = { "doubleTap" },
+	certificationsRequired = { "pointBlankArea2" },
 	-- See http://www.ocdsoft.com/files/accuracy.xls
 	creatureAccuracyModifiers = { "pistol_accuracy" },
 

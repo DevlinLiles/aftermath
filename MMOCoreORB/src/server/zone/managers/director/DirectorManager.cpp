@@ -254,13 +254,13 @@ uint64 DirectorManager::readSharedMemory(const String& key) {
 	return data;
 }
 
-Vector<Reference<ScreenPlayTask*> > DirectorManager::getPlayerEvents(CreatureObject* player) {
+Vector<Reference<ScreenPlayTask*> > DirectorManager::getObjectEvents(SceneObject* obj) {
 	Vector<Reference<ScreenPlayTask*> > eventList;
 
 	for (int i = 0; i < screenplayTasks.size(); i++) {
 		Reference<ScreenPlayTask*> task = screenplayTasks.get(i);
 
-		if (task->getSceneObject() == player) {
+		if (task->getSceneObject() == obj) {
 			eventList.add(task);
 		}
 	}
@@ -318,6 +318,7 @@ void DirectorManager::initializeLuaEngine(Lua* luaEngine) {
 	StringBuffer fileName;
 	fileName << "log/lua.log";
 	luaEngine->setFileLogger(fileName.toString(), true);
+	luaEngine->setLogJSON(ConfigManager::instance()->getLuaLogJSON());
 
 	setupLuaPackagePath(luaEngine);
 
@@ -459,7 +460,7 @@ void DirectorManager::initializeLuaEngine(Lua* luaEngine) {
 	luaEngine->setGlobalInt("OBJECTRADIALOPENED", ObserverEventType::OBJECTRADIALOPENED);
 	luaEngine->setGlobalInt("ENTEREDBUILDING", ObserverEventType::ENTEREDBUILDING);
 	luaEngine->setGlobalInt("EXITEDBUILDING", ObserverEventType::EXITEDBUILDING);
-	luaEngine->setGlobalInt("SPATIALCHATRECEIVED", ObserverEventType::SPATIALCHATRECEIVED);
+	luaEngine->setGlobalInt("SPATIALCHATSENT", ObserverEventType::SPATIALCHATSENT);
 	luaEngine->setGlobalInt("ITEMLOOTED", ObserverEventType::ITEMLOOTED);
 	luaEngine->setGlobalInt("MEDPACKUSED", ObserverEventType::MEDPACKUSED);
 	luaEngine->setGlobalInt("BADGEAWARDED", ObserverEventType::BADGEAWARDED);
@@ -3024,7 +3025,7 @@ int DirectorManager::awardSkill(lua_State* L) {
 	if(creature == NULL)
 		return 0;
 
-	SkillManager::instance()->awardSkill(skillName, creature, true, false, true);
+	SkillManager::instance()->awardSkill(skillName, creature, true, true, true);
 
 	return 0;
 }

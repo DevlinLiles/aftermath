@@ -67,7 +67,21 @@ bool CombatManager::startCombat(CreatureObject* attacker, TangibleObject* defend
 
 	attacker->clearState(CreatureState::PEACE);
 
+	if (attacker->isPlayerCreature() && !attacker->hasDefender(defender)) {
+		ManagedReference<WeaponObject*> weapon = attacker->getWeapon();
+
+		if (weapon != NULL && weapon->isJediWeapon())
+			VisibilityManager::instance()->increaseVisibility(attacker, 25);
+	}
+
 	Locker clocker(defender, attacker);
+
+	if (creo != NULL && creo->isPlayerCreature() && !creo->hasDefender(attacker)) {
+		ManagedReference<WeaponObject*> weapon = creo->getWeapon();
+
+		if (weapon != NULL && weapon->isJediWeapon())
+			VisibilityManager::instance()->increaseVisibility(creo, 25);
+	}
 
 	attacker->setDefender(defender);
 	defender->addDefender(attacker);
@@ -193,8 +207,27 @@ int CombatManager::doCombatAction(CreatureObject* attacker, WeaponObject* weapon
 	if (data.getCommand()->isAreaAction() || data.getCommand()->isConeAction()) {
 		Reference<SortedVector<ManagedReference<TangibleObject*> >* > areaDefenders = getAreaTargets(attacker, weapon, defenderObject, data);
 
-		for (int i=0; i<areaDefenders->size(); i++) {
-			damage += doTargetCombatAction(attacker, weapon, areaDefenders->get(i), data, &shouldGcwTef, &shouldBhTef, &shouldJediTef);
+		while (areaDefenders->size() > 0) {
+			for (int i = areaDefenders->size()-1; i >= 0 ; i--) {
+				TangibleObject* tano = areaDefenders->get(i);
+				if (tano == attacker ||  tano == NULL) {
+					areaDefenders->remove(i);
+					continue;
+				}
+
+				if (!tano->tryWLock()) {
+					continue;
+				}
+
+				damage += doTargetCombatAction(attacker, weapon, areaDefenders->get(i), data, &shouldGcwTef,
+											   &shouldBhTef, &shouldJediTef);
+				areaDefenders->remove(i);
+
+				tano->unlock();
+			}
+			attacker->unlock();
+			Thread::yield();
+			attacker->wlock(true);
 		}
 	}
 
@@ -221,6 +254,8 @@ int CombatManager::doCombatAction(CreatureObject* attacker, WeaponObject* weapon
 				ghost->updateLastPvpCombatActionTimestamp(shouldGcwTef, shouldBhTef, shouldJediTef);
 				ManagedReference<CreatureObject*> defenderCreature = cast<CreatureObject*>(defenderObject);
 				if (defenderCreature != NULL){
+					olocker.release();
+					Locker olocker(defenderCreature, attacker);
 					ManagedReference<PlayerObject*> defenderPlayer = defenderCreature->getPlayerObject(); 
 					if (defenderPlayer != NULL && shouldJediTef)
 						defenderPlayer->updateLastPvpCombatActionTimestamp(false, false, true);
@@ -275,6 +310,11 @@ int CombatManager::doTargetCombatAction(CreatureObject* attacker, WeaponObject* 
 		damage = doTargetCombatAction(attacker, weapon, defender, data, shouldGcwTef, shouldBhTef, shouldJediTef);
 	} else {
 		int poolsToDamage = calculatePoolsToDamage(data.getPoolsToDamage());
+		if (tano != NULL && attacker != NULL && attacker->isPlayerCreature() && tano->getFaction() != 0 && attacker->getFaction() != tano->getFaction()){
+			PlayerObject* ghost = attacker->getPlayerObject();
+			if (ghost != NULL)
+				ghost->updateLastPvpCombatActionTimestamp(true, false, false);
+		}
 
 		damage = applyDamage(attacker, weapon, tano, poolsToDamage, data);
 
@@ -820,6 +860,10 @@ float CombatManager::getDefenderToughnessModifier(CreatureObject* defender, int 
 	int jediToughness = defender->getSkillMod("jedi_toughness");
 	if (damType != SharedWeaponObjectTemplate::LIGHTSABER && jediToughness > 0)
 		damage *= 1.f - (jediToughness / 100.f);
+
+	if (damType == SharedWeaponObjectTemplate::LIGHTSABER && defender->isPlayerCreature() && defender->hasSkill("combat_bountyhunter_master")){
+		damage *= 1.f - (25.f/100.f);
+	}
 
 	return damage < 0 ? 0 : damage;
 }
@@ -1526,9 +1570,19 @@ int CombatManager::getHitChance(TangibleObject* attacker, CreatureObject* target
 
 		// saber block is special because it's just a % chance to block based on the skillmod
 		if (def == "saber_block") {
-			if (!attacker->isTurret() && (weapon->getAttackType() == SharedWeaponObjectTemplate::RANGEDATTACK) && ((System::random(100)) < targetCreature->getSkillMod(def)))
-				return RICOCHET;
-			else return HIT;
+			if ((attacker->isPlayerCreature() && weapon->getAttackType() == SharedWeaponObjectTemplate::RANGEDATTACK) && attacker->asCreatureObject()->hasSkill("combat_bountyhunter_master") && !(weapon->isThrownWeapon() || weapon->isSpecialHeavyWeapon())){
+				if (System::random(105) < targetCreature->getSkillMod(def)){
+					return RICOCHET;
+				} else {
+					return HIT;
+				}
+			} else if (!(attacker->isTurret() || weapon->isThrownWeapon()) && ((weapon->isHeavyWeapon() || weapon->isSpecialHeavyWeapon() || (weapon->getAttackType() == SharedWeaponObjectTemplate::RANGEDATTACK)))){
+				if (System::random(100) < targetCreature->getSkillMod(def)){
+					return RICOCHET;
+				} else {
+					return HIT;
+				}
+			}
 		}
 
 		targetDefense = getDefenderSecondaryDefenseModifier(targetCreature);
@@ -1580,7 +1634,7 @@ float CombatManager::calculateWeaponAttackSpeed(CreatureObject* attacker, Weapon
 	float attackSpeed = (1.0f - ((float) speedMod / 100.0f)) * skillSpeedRatio * weapon->getAttackSpeed();
 
 	if (jediSpeed > 0)
-		attackSpeed = attackSpeed * jediSpeed;
+		attackSpeed = attackSpeed - (attackSpeed * jediSpeed);
 
 	return Math::max(attackSpeed, 1.0f);
 }
@@ -2108,7 +2162,7 @@ void CombatManager::broadcastCombatSpam(TangibleObject* attacker, TangibleObject
 
 	if (vec != NULL) {
 		closeObjects.removeAll(vec->size(), 10);
-		vec->safeCopyTo(closeObjects);
+		vec->safeCopyReceiversTo(closeObjects, CloseObjectsVector::PLAYERTYPE);
 	} else {
 #ifdef COV_DEBUG
 		info("Null closeobjects vector in CombatManager::broadcastCombatSpam", true);

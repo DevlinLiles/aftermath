@@ -55,8 +55,19 @@ object_tangible_beta_beta_terminal_wound = object_tangible_beta_shared_beta_term
 
 
 	itemList = {
-			"Buff Character (4,000 Credits)", "enhance_character",
+			"Cheap Character Buff (2,000 Credits)", "cheap_enhance_character",
+			"Expensive Character Medical Buff (40,000 Credits)", "expensive_enhance_character_body",
+			"Expensive Character Mind Buff (40,000 Credits)", "expensive_enhance_character_mind",
 			"Remove Buffs", "reset_buffs",
+			"Skills",
+			{
+				"Learn Languages", "language",
+				"Master Politician", "social_politician_master",
+				"WARNING UNLEARN ALL SKILLS WARNING",
+					{
+					"Last chance to cancel, no undoing this!!", "unlearn_all_skills",
+					}
+			}
 			
 	}
 }
